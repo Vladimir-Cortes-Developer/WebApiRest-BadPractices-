@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Lab03WebApiOrdenesCompras.Datos;
 using Lab03WebApiOrdenesCompras.Models;
+using Microsoft.AspNetCore.JsonPatch;
+
 
 namespace Lab03WebApiOrdenesCompras.Controllers
 {
@@ -99,6 +101,40 @@ namespace Lab03WebApiOrdenesCompras.Controllers
 
             return NoContent();
         }
+
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchProduct(int id, [FromBody] JsonPatchDocument<Product> patchDoc)
+        {
+            if (patchDoc == null)
+                return BadRequest();
+
+            // 1. Recuperar la entidad existente
+            var productFromDb = await _context.Products.FindAsync(id);
+            if (productFromDb == null)
+                return NotFound();
+
+            // 2. Aplicar el patch directamente
+            patchDoc.ApplyTo(productFromDb, ModelState);
+
+            // 3. Validar el modelo resultante
+            if (!TryValidateModel(productFromDb))
+                return BadRequest(ModelState);
+
+            // 4. Guardar cambios
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException) when (!ProductExists(id))
+            {
+                return NotFound();
+            }
+
+            // 5. Devolver el recurso modificado
+            return Ok(productFromDb);
+        }
+
 
         private bool ProductExists(int id)
         {
