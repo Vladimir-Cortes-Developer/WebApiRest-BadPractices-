@@ -1,6 +1,0 @@
-@Lab03WebApiOrdenesCompras_HostAddress = http://localhost:5209
-
-GET {{Lab03WebApiOrdenesCompras_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

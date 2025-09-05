@@ -28,6 +28,9 @@ public partial class Customer
     [StringLength(20)]
     public string? Phone { get; set; }
 
+    [StringLength(80)]
+    public string? Email { get; set; }
+
     [InverseProperty("Customer")]
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }
